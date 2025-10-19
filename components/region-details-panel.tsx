@@ -53,6 +53,7 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
   const [partition, setPartition] = useState<Partition | null>(null)
   const [activeTab, setActiveTab] = useState<"overview" | "azs" | "local" | "partition">("overview")
   const [regionCodeMapping, setRegionCodeMapping] = useState<Record<string, string>>({})
+  const [regionIdentifiers, setRegionIdentifiers] = useState<Record<string, string>>({})
 
   useEffect(() => {
     // Load region code mapping
@@ -62,6 +63,14 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
         setRegionCodeMapping(mapping)
       })
       .catch(err => console.error("Failed to load mapping:", err))
+    
+    // Load region identifiers
+    fetch("/aws-region-identifiers.json")
+      .then(res => res.json())
+      .then((identifiers: Record<string, string>) => {
+        setRegionIdentifiers(identifiers)
+      })
+      .catch(err => console.error("Failed to load region identifiers:", err))
   }, [])
 
   useEffect(() => {
@@ -113,6 +122,14 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
     return String.fromCodePoint(...codePoints)
   }
 
+  const getAwsRegionId = () => {
+    const mappedCode = regionCodeMapping[region.code]
+    if (mappedCode && regionIdentifiers[mappedCode]) {
+      return regionIdentifiers[mappedCode]
+    }
+    return null
+  }
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
@@ -142,8 +159,11 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
               )}
               <div>
                 <h2 className="text-3xl font-bold text-white mb-2">{region.name}</h2>
+                {getAwsRegionId() && (
+                  <div className="text-lg text-cyan-400 font-mono mb-2">{getAwsRegionId()}</div>
+                )}
                 <div className="flex items-center gap-3">
-                  <span className="text-cyan-400 font-mono text-sm">{region.code}</span>
+                  <span className="text-gray-400 font-mono text-sm">{region.code}</span>
                   <span className="text-gray-400">•</span>
                   <span className="text-gray-300">{region.city}</span>
                 </div>
@@ -161,10 +181,10 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-800 bg-[#111111] overflow-x-auto">
+        <div className="flex border-b border-gray-800 bg-[#111111] overflow-x-auto flex-shrink-0">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap cursor-pointer flex-shrink-0 ${
               activeTab === "overview"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
@@ -179,44 +199,44 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
           </button>
           <button
             onClick={() => setActiveTab("azs")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap cursor-pointer flex-shrink-0 ${
               activeTab === "azs"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
             }`}
           >
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
               </svg>
               Availability Zones
-              <span className="bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full text-xs">
+              <span className="bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full text-xs flex-shrink-0">
                 {availabilityZones.length}
               </span>
             </div>
           </button>
           <button
             onClick={() => setActiveTab("local")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap cursor-pointer flex-shrink-0 ${
               activeTab === "local"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
             }`}
           >
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               Local Zones
-              <span className="bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full text-xs">
+              <span className="bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full text-xs flex-shrink-0">
                 {localZones.length}
               </span>
             </div>
           </button>
           <button
             onClick={() => setActiveTab("partition")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap cursor-pointer flex-shrink-0 ${
               activeTab === "partition"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
