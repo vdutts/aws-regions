@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import RotatingEarth from "@/components/rotating-earth"
 
 interface AWSRegion {
@@ -19,6 +19,8 @@ export default function Home() {
   const [sidebarWidth, setSidebarWidth] = useState(420)
   const [isResizing, setIsResizing] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | null>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetch("/aws-regions.json")
@@ -26,6 +28,20 @@ export default function Home() {
       .then(data => setRegions(data))
       .catch(err => console.error("Failed to load regions:", err))
   }, [])
+
+  // Update modal position whenever the modal is rendered
+  useEffect(() => {
+    if (selectedRegion && modalRef.current) {
+      const rect = modalRef.current.getBoundingClientRect()
+      // Use the center-left edge of the modal as the connection point
+      setModalPosition({
+        x: rect.left,
+        y: rect.top + rect.height / 2
+      })
+    } else {
+      setModalPosition(null)
+    }
+  }, [selectedRegion, selectedRegions])
 
   const filteredRegions = regions.filter(region =>
     region.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -204,12 +220,14 @@ export default function Home() {
       <div className="flex-1 relative h-screen bg-[#0a0a0a]">
         {/* Selected Regions Info Cards */}
         <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap gap-3 max-h-[calc(100vh-8rem)] overflow-y-auto">
-          {Array.from(selectedRegions).map((code) => {
+          {Array.from(selectedRegions).map((code, index) => {
             const region = regions.find(r => r.code === code)
             if (!region) return null
+            const isMainSelected = selectedRegion?.code === code
             return (
               <div
                 key={code}
+                ref={isMainSelected ? modalRef : null}
                 className="bg-[#111111]/95 backdrop-blur-sm border-2 border-yellow-500 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px] relative"
                 style={{
                   boxShadow: '0 0 50px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.3)'
@@ -265,7 +283,7 @@ export default function Home() {
 
         {/* Globe - Full Screen */}
         <div className="w-full h-full flex items-center justify-center">
-          <RotatingEarth width={2000} height={2000} selectedRegion={selectedRegion} />
+          <RotatingEarth width={2000} height={2000} selectedRegion={selectedRegion} modalPosition={modalPosition} />
         </div>
       </div>
     </main>
