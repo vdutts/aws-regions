@@ -300,7 +300,15 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     
     renderRef.current = render
 
+    let hoverCheckTimeout: number | null = null
     const handleMouseMove = (event: MouseEvent) => {
+      // Throttle hover checks for better performance
+      if (hoverCheckTimeout) return
+      
+      hoverCheckTimeout = window.setTimeout(() => {
+        hoverCheckTimeout = null
+      }, 16) // ~60fps
+      
       const rect = canvas.getBoundingClientRect()
       const mouseX = event.clientX - rect.left
       const mouseY = event.clientY - rect.top
@@ -321,7 +329,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
             const dx = mouseX - x
             const dy = mouseY - y
             const dist = Math.sqrt(dx * dx + dy * dy)
-            if (dist < 12) {
+            if (dist < 15) {
               hoveredRegion = region
               break
             }
@@ -378,7 +386,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       const startRotation = [...rotation]
 
       const handleMouseMoveWhileDragging = (moveEvent: MouseEvent) => {
-        const sensitivity = 0.5
+        const sensitivity = 0.25
         const dx = moveEvent.clientX - startX
         const dy = moveEvent.clientY - startY
 
@@ -387,7 +395,13 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
         rotation[1] = Math.max(-90, Math.min(90, rotation[1]))
 
         projection.rotate(rotation)
-        render()
+        
+        // Use requestAnimationFrame for smoother rendering
+        if (!window.requestAnimationFrame) {
+          render()
+        } else {
+          requestAnimationFrame(render)
+        }
       }
 
       const handleMouseUp = () => {
@@ -400,12 +414,44 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       document.addEventListener("mouseup", handleMouseUp)
     }
 
+    let zoomAnimationFrame: number | null = null
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault()
-      const scaleFactor = event.deltaY > 0 ? 0.9 : 1.1
-      const newRadius = Math.max(radius * 0.5, Math.min(radius * 3, projection.scale() * scaleFactor))
-      projection.scale(newRadius)
-      render()
+      
+      // Smoother zoom with smaller increments
+      const scaleFactor = event.deltaY > 0 ? 0.95 : 1.05
+      const currentScale = projection.scale()
+      const newRadius = Math.max(radius * 0.5, Math.min(radius * 3, currentScale * scaleFactor))
+      
+      // Cancel any pending animation
+      if (zoomAnimationFrame) {
+        cancelAnimationFrame(zoomAnimationFrame)
+      }
+      
+      // Smooth zoom animation
+      const startScale = currentScale
+      const duration = 100 // ms
+      const startTime = Date.now()
+      
+      const animateZoom = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        
+        // Ease out
+        const eased = 1 - Math.pow(1 - progress, 3)
+        const scale = startScale + (newRadius - startScale) * eased
+        
+        projection.scale(scale)
+        render()
+        
+        if (progress < 1) {
+          zoomAnimationFrame = requestAnimationFrame(animateZoom)
+        } else {
+          zoomAnimationFrame = null
+        }
+      }
+      
+      animateZoom()
     }
 
     canvas.addEventListener("mousemove", handleMouseMove)
@@ -435,19 +481,17 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     // Calculate target rotation to center the selected region
     const targetRotation = [-selectedRegion.lng, -selectedRegion.lat]
     
-    // Animate rotation
+    // Animate rotation with smoother easing
     const startRotation = [...rotation]
-    const duration = 1000 // ms
+    const duration = 800 // ms - faster
     const startTime = Date.now()
 
     const animate = () => {
       const elapsed = Date.now() - startTime
       const progress = Math.min(elapsed / duration, 1)
       
-      // Easing function (ease-in-out)
-      const eased = progress < 0.5
-        ? 2 * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2
+      // Smooth ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
 
       rotation[0] = startRotation[0] + (targetRotation[0] - startRotation[0]) * eased
       rotation[1] = startRotation[1] + (targetRotation[1] - startRotation[1]) * eased
