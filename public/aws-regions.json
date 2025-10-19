@@ -1,27 +1,674 @@
 [
   {
-    "name": "US East 1 (N. Virginia)",
-    "code": "us-east-1",
-    "lat": 38.13,
-    "lng": -78.45,
+    "city": "Columbus",
+    "code": "US-OH",
+    "country": "US",
     "info": [
-      "0.5 GB storage",
-      "Scales to zero when inactive",
-      "Autoscaling up to 2 CU",
-      "10 branches per project"
-    ]
+      "3 Availability Zones",
+      "Launched: 2018-11-12",
+      "Partition: aws-us-gov",
+      "Country: US"
+    ],
+    "lat": 39.96,
+    "lng": -83.0,
+    "name": "AWS GovCloud (US-East)"
   },
   {
-    "name": "EU West 1 (Ireland)",
-    "code": "eu-west-1",
+    "city": "Boardman",
+    "code": "US-OR",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2011-08-16",
+      "Partition: aws-us-gov",
+      "Country: US"
+    ],
+    "lat": 45.84,
+    "lng": -119.7,
+    "name": "AWS GovCloud (US-West)"
+  },
+  {
+    "city": "Cape Town",
+    "code": "ZA-WC",
+    "country": "ZA",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2020-04-22",
+      "Partition: aws",
+      "Country: ZA"
+    ],
+    "lat": -33.92,
+    "lng": 18.42,
+    "name": "Africa (Cape Town)"
+  },
+  {
+    "city": "Hong Kong",
+    "code": "CN-HK",
+    "country": "CN",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2019-04-24",
+      "Partition: aws",
+      "Country: CN"
+    ],
+    "lat": 22.32,
+    "lng": 114.17,
+    "name": "Asia Pacific (Hong Kong)"
+  },
+  {
+    "city": "Hyderabad",
+    "code": "IN-TG",
+    "country": "IN",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2022-11-21",
+      "Partition: aws",
+      "Country: IN"
+    ],
+    "lat": 17.39,
+    "lng": 78.49,
+    "name": "Asia Pacific (Hyderabad)"
+  },
+  {
+    "city": "Jakarta",
+    "code": "ID-JK",
+    "country": "ID",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2021-12-13",
+      "Partition: aws",
+      "Country: ID"
+    ],
+    "lat": -6.21,
+    "lng": 106.85,
+    "name": "Asia Pacific (Jakarta)"
+  },
+  {
+    "city": "Kuala Lumpur",
+    "code": "MY-14",
+    "country": "MY",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2024-08-21",
+      "Partition: aws",
+      "Country: MY"
+    ],
+    "lat": 3.14,
+    "lng": 101.69,
+    "name": "Asia Pacific (Malaysia)"
+  },
+  {
+    "city": "Melbourne",
+    "code": "AU-VIC",
+    "country": "AU",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2023-01-23",
+      "Partition: aws",
+      "Country: AU"
+    ],
+    "lat": -37.81,
+    "lng": 144.96,
+    "name": "Asia Pacific (Melbourne)"
+  },
+  {
+    "city": "Mumbai",
+    "code": "IN-MH",
+    "country": "IN",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2016-06-27",
+      "Partition: aws",
+      "Country: IN"
+    ],
+    "lat": 19.08,
+    "lng": 72.88,
+    "name": "Asia Pacific (Mumbai)"
+  },
+  {
+    "city": "Auckland",
+    "code": "NZ-AUK",
+    "country": "NZ",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-08-28",
+      "Partition: aws",
+      "Country: NZ"
+    ],
+    "lat": -36.85,
+    "lng": 174.76,
+    "name": "Asia Pacific (New Zealand)"
+  },
+  {
+    "city": "Osaka",
+    "code": "JP-27",
+    "country": "JP",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2018-02-12",
+      "Partition: aws",
+      "Country: JP"
+    ],
+    "lat": 34.69,
+    "lng": 135.5,
+    "name": "Asia Pacific (Osaka)"
+  },
+  {
+    "city": "Incheon",
+    "code": "KR-28",
+    "country": "KR",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2016-01-07",
+      "Partition: aws",
+      "Country: KR"
+    ],
+    "lat": 37.46,
+    "lng": 126.44,
+    "name": "Asia Pacific (Seoul)"
+  },
+  {
+    "city": "Singapore",
+    "code": "SG-01",
+    "country": "SG",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2010-04-29",
+      "Partition: aws",
+      "Country: SG"
+    ],
+    "lat": 1.35,
+    "lng": 103.82,
+    "name": "Asia Pacific (Singapore)"
+  },
+  {
+    "city": "Sydney",
+    "code": "AU-NSW",
+    "country": "AU",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2012-11-12",
+      "Partition: aws",
+      "Country: AU"
+    ],
+    "lat": -33.87,
+    "lng": 151.21,
+    "name": "Asia Pacific (Sydney)"
+  },
+  {
+    "city": "Taipei",
+    "code": "TW-TPE",
+    "country": "TW",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-06-05",
+      "Partition: aws",
+      "Country: TW"
+    ],
+    "lat": 25.03,
+    "lng": 121.56,
+    "name": "Asia Pacific (Taipei)"
+  },
+  {
+    "city": "Bangkok",
+    "code": "TH-10",
+    "country": "TH",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-01-07",
+      "Partition: aws",
+      "Country: TH"
+    ],
+    "lat": 13.75,
+    "lng": 100.5,
+    "name": "Asia Pacific (Thailand)"
+  },
+  {
+    "city": "Tokyo",
+    "code": "JP-13",
+    "country": "JP",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2011-03-02",
+      "Partition: aws",
+      "Country: JP"
+    ],
+    "lat": 35.68,
+    "lng": 139.65,
+    "name": "Asia Pacific (Tokyo)"
+  },
+  {
+    "city": "Montreal",
+    "code": "CA-QC",
+    "country": "CA",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2016-12-08",
+      "Partition: aws",
+      "Country: CA"
+    ],
+    "lat": 45.5,
+    "lng": -73.57,
+    "name": "Canada (Central)"
+  },
+  {
+    "city": "Calgary",
+    "code": "CA-AB",
+    "country": "CA",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2023-12-20",
+      "Partition: aws",
+      "Country: CA"
+    ],
+    "lat": 51.05,
+    "lng": -114.07,
+    "name": "Canada West (Calgary)"
+  },
+  {
+    "city": "Beijing",
+    "code": "CN-BJ",
+    "country": "CN",
+    "info": [
+      "5 Availability Zones",
+      "Launched: 2014-03-01",
+      "Partition: aws-cn",
+      "Country: CN"
+    ],
+    "lat": 39.9,
+    "lng": 116.4,
+    "name": "China (Beijing)"
+  },
+  {
+    "city": "Ningxia",
+    "code": "CN-NX",
+    "country": "CN",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2017-12-11",
+      "Partition: aws-cn",
+      "Country: CN"
+    ],
+    "lat": 38.47,
+    "lng": 106.27,
+    "name": "China (Ningxia)"
+  },
+  {
+    "city": "Beijing",
+    "code": "CN-11",
+    "country": "CN",
+    "info": [
+      "2 Availability Zones",
+      "Launched: 2005-01-01",
+      "Partition: aws",
+      "Country: CN"
+    ],
+    "lat": 39.9,
+    "lng": 116.4,
+    "name": "China (Peking)"
+  },
+  {
+    "city": "Newcastle upon Tyne",
+    "code": "GB-NET",
+    "country": "GB",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-07-21",
+      "Partition: aws-iso-e",
+      "Country: GB"
+    ],
+    "lat": 54.97,
+    "lng": -1.61,
+    "name": "EU ISOE West"
+  },
+  {
+    "city": "Frankfurt",
+    "code": "DE-HE",
+    "country": "DE",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2014-10-23",
+      "Partition: aws",
+      "Country: DE"
+    ],
+    "lat": 50.11,
+    "lng": 8.68,
+    "name": "Europe (Frankfurt)"
+  },
+  {
+    "city": "Dublin",
+    "code": "IE-D",
+    "country": "IE",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2008-12-10",
+      "Partition: aws",
+      "Country: IE"
+    ],
     "lat": 53.35,
     "lng": -6.26,
+    "name": "Europe (Ireland)"
+  },
+  {
+    "city": "London",
+    "code": "GB-LND",
+    "country": "GB",
     "info": [
-      "0.5 GB storage",
-      "Scales to zero when inactive",
-      "Autoscaling up to 2 CU",
-      "10 branches per project"
-    ]
+      "5 Availability Zones",
+      "Launched: 2016-12-13",
+      "Partition: aws",
+      "Country: GB"
+    ],
+    "lat": 51.51,
+    "lng": -0.13,
+    "name": "Europe (London)"
+  },
+  {
+    "city": "Milan",
+    "code": "IT-MI",
+    "country": "IT",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2020-04-28",
+      "Partition: aws",
+      "Country: IT"
+    ],
+    "lat": 45.46,
+    "lng": 9.19,
+    "name": "Europe (Milan)"
+  },
+  {
+    "city": "Paris",
+    "code": "FR-75C",
+    "country": "FR",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2017-12-18",
+      "Partition: aws",
+      "Country: FR"
+    ],
+    "lat": 48.86,
+    "lng": 2.35,
+    "name": "Europe (Paris)"
+  },
+  {
+    "city": "Zaragoza",
+    "code": "ES-AR",
+    "country": "ES",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2022-11-15",
+      "Partition: aws",
+      "Country: ES"
+    ],
+    "lat": 41.66,
+    "lng": -0.88,
+    "name": "Europe (Spain)"
+  },
+  {
+    "city": "Stockholm",
+    "code": "SE-AB",
+    "country": "SE",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2018-12-11",
+      "Partition: aws",
+      "Country: SE"
+    ],
+    "lat": 59.33,
+    "lng": 18.06,
+    "name": "Europe (Stockholm)"
+  },
+  {
+    "city": "Zurich",
+    "code": "CH-ZH",
+    "country": "CH",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2022-11-08",
+      "Partition: aws",
+      "Country: CH"
+    ],
+    "lat": 47.37,
+    "lng": 8.54,
+    "name": "Europe (Zurich)"
+  },
+  {
+    "city": "Hyderabad",
+    "code": "IN-TG",
+    "country": "IN",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2021-05-17",
+      "Partition: aws",
+      "Country: IN"
+    ],
+    "lat": 17.39,
+    "lng": 78.49,
+    "name": "India (Begumpet)"
+  },
+  {
+    "city": "Tel Aviv",
+    "code": "IL-TA",
+    "country": "IL",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2023-07-31",
+      "Partition: aws",
+      "Country: IL"
+    ],
+    "lat": 32.08,
+    "lng": 34.78,
+    "name": "Israel (Tel Aviv)"
+  },
+  {
+    "city": "Luxembourg City",
+    "code": "LU-LU",
+    "country": "LU",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2006-03-25",
+      "Partition: aws",
+      "Country: LU"
+    ],
+    "lat": 49.61,
+    "lng": 6.13,
+    "name": "Luxembourg"
+  },
+  {
+    "city": "Quer\u00e9taro",
+    "code": "MX-QUE",
+    "country": "MX",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-01-13",
+      "Partition: aws",
+      "Country: MX"
+    ],
+    "lat": 20.59,
+    "lng": -100.39,
+    "name": "Mexico (Central)"
+  },
+  {
+    "city": "Bahrain",
+    "code": "BH-14",
+    "country": "BH",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2019-07-29",
+      "Partition: aws",
+      "Country: BH"
+    ],
+    "lat": 26.07,
+    "lng": 50.56,
+    "name": "Middle East (Bahrain)"
+  },
+  {
+    "city": "Dubai",
+    "code": "AE-DU",
+    "country": "AE",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2022-08-29",
+      "Partition: aws",
+      "Country: AE"
+    ],
+    "lat": 25.2,
+    "lng": 55.27,
+    "name": "Middle East (UAE)"
+  },
+  {
+    "city": "Sao Paulo",
+    "code": "BR-SP",
+    "country": "BR",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2011-12-14",
+      "Partition: aws",
+      "Country: BR"
+    ],
+    "lat": -23.55,
+    "lng": -46.63,
+    "name": "South America (Sao Paulo)"
+  },
+  {
+    "city": "Ashburn",
+    "code": "US-VA",
+    "country": "US",
+    "info": [
+      "14 Availability Zones",
+      "Launched: 2006-06-30",
+      "Partition: aws",
+      "Country: US"
+    ],
+    "lat": 39.04,
+    "lng": -77.49,
+    "name": "US East (N. Virginia)"
+  },
+  {
+    "city": "Columbus",
+    "code": "US-OH",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2016-10-17",
+      "Partition: aws",
+      "Country: US"
+    ],
+    "lat": 39.96,
+    "lng": -83.0,
+    "name": "US East (Ohio)"
+  },
+  {
+    "city": "Ashburn",
+    "code": "US-VA",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2014-07-21",
+      "Partition: aws-iso",
+      "Country: US"
+    ],
+    "lat": 39.04,
+    "lng": -77.49,
+    "name": "US ISO East"
+  },
+  {
+    "city": "Aurora",
+    "code": "US-CO",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2021-10-11",
+      "Partition: aws-iso",
+      "Country: US"
+    ],
+    "lat": 39.73,
+    "lng": -104.83,
+    "name": "US ISO WEST"
+  },
+  {
+    "city": "Columbus",
+    "code": "US-OH",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2017-11-17",
+      "Partition: aws-iso-b",
+      "Country: US"
+    ],
+    "lat": 39.96,
+    "lng": -83.0,
+    "name": "US ISOB East (Ohio)"
+  },
+  {
+    "city": "California",
+    "code": "US-MD",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-03-28",
+      "Partition: aws-iso-f",
+      "Country: US"
+    ],
+    "lat": 36.78,
+    "lng": -119.42,
+    "name": "US ISOF EAST"
+  },
+  {
+    "city": "Alpine",
+    "code": "US-TX",
+    "country": "US",
+    "info": [
+      "3 Availability Zones",
+      "Launched: 2025-03-28",
+      "Partition: aws-iso-f",
+      "Country: US"
+    ],
+    "lat": 30.36,
+    "lng": -103.66,
+    "name": "US ISOF SOUTH"
+  },
+  {
+    "city": "San Jose",
+    "code": "US-CA",
+    "country": "US",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2009-12-03",
+      "Partition: aws",
+      "Country: US"
+    ],
+    "lat": 37.34,
+    "lng": -121.89,
+    "name": "US West (N. California)"
+  },
+  {
+    "city": "Boardman",
+    "code": "US-OR",
+    "country": "US",
+    "info": [
+      "4 Availability Zones",
+      "Launched: 2011-11-09",
+      "Partition: aws",
+      "Country: US"
+    ],
+    "lat": 45.84,
+    "lng": -119.7,
+    "name": "US West (Oregon)"
+  },
+  {
+    "city": "Seattle",
+    "code": "US-WA",
+    "country": "US",
+    "info": [
+      "5 Availability Zones",
+      "Launched: 1995-01-01",
+      "Partition: aws",
+      "Country: US"
+    ],
+    "lat": 47.61,
+    "lng": -122.33,
+    "name": "US West (Seattle)"
   }
 ]
-
