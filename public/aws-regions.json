@@ -1,0 +1,27 @@
+[
+  {
+    "name": "US East 1 (N. Virginia)",
+    "code": "us-east-1",
+    "lat": 38.13,
+    "lng": -78.45,
+    "info": [
+      "0.5 GB storage",
+      "Scales to zero when inactive",
+      "Autoscaling up to 2 CU",
+      "10 branches per project"
+    ]
+  },
+  {
+    "name": "EU West 1 (Ireland)",
+    "code": "eu-west-1",
+    "lat": 53.35,
+    "lng": -6.26,
+    "info": [
+      "0.5 GB storage",
+      "Scales to zero when inactive",
+      "Autoscaling up to 2 CU",
+      "10 branches per project"
+    ]
+  }
+]
+
