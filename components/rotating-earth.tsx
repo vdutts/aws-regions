@@ -7,6 +7,7 @@ interface RotatingEarthProps {
   width?: number
   height?: number
   className?: string
+  selectedRegion?: AWSRegion | null
 }
 
 interface AWSRegion {
@@ -23,11 +24,14 @@ interface TooltipData {
   y: number
 }
 
-export default function RotatingEarth({ width = 800, height = 600, className = "" }: RotatingEarthProps) {
+export default function RotatingEarth({ width = 800, height = 600, className = "", selectedRegion = null }: RotatingEarthProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
+  const projectionRef = useRef<any>(null)
+  const rotationRef = useRef<number[]>([0, 0])
+  const renderRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -55,6 +59,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       .translate([containerWidth / 2, containerHeight / 2])
       .clipAngle(90)
 
+    projectionRef.current = projection
     const path = d3.geoPath().projection(projection).context(context)
 
     const pointInPolygon = (point: [number, number], polygon: number[][]): boolean => {
@@ -278,7 +283,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     }
 
     // Set up rotation and interaction
-    const rotation = [0, 0]
+    const rotation = rotationRef.current
     let autoRotate = false
     const rotationSpeed = 0.5
 
@@ -292,6 +297,8 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
     // Auto-rotation timer
     const rotationTimer = d3.timer(rotate)
+    
+    renderRef.current = render
 
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
@@ -416,6 +423,45 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       canvas.removeEventListener("wheel", handleWheel)
     }
   }, [width, height])
+
+  // Handle selected region zoom
+  useEffect(() => {
+    if (!selectedRegion || !projectionRef.current || !renderRef.current) return
+
+    const projection = projectionRef.current
+    const render = renderRef.current
+    const rotation = rotationRef.current
+
+    // Calculate target rotation to center the selected region
+    const targetRotation = [-selectedRegion.lng, -selectedRegion.lat]
+    
+    // Animate rotation
+    const startRotation = [...rotation]
+    const duration = 1000 // ms
+    const startTime = Date.now()
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      
+      // Easing function (ease-in-out)
+      const eased = progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2
+
+      rotation[0] = startRotation[0] + (targetRotation[0] - startRotation[0]) * eased
+      rotation[1] = startRotation[1] + (targetRotation[1] - startRotation[1]) * eased
+
+      projection.rotate(rotation)
+      render()
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    animate()
+  }, [selectedRegion])
 
   if (error) {
     return (
