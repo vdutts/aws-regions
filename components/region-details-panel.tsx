@@ -130,6 +130,17 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
     return null
   }
 
+  // Handle ESC key to close
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [onClose])
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
@@ -169,14 +180,6 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
                 </div>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg p-2 transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -313,15 +316,19 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
                         Build Order: {az["Build Order"]}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-gray-400">Status:</span>
-                        <span className="text-white ml-2">{az["Parent Region Status"]}</span>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        <span className="text-gray-400 text-sm">Status:</span>
+                        <span className="text-white text-sm">{az["Parent Region Status"]}</span>
                       </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-400">Data Centers:</span>
-                        <div className="text-white mt-1 font-mono text-xs bg-[#0a0a0a] p-2 rounded break-all">
-                          {az["Data Centers"]}
+                      <div>
+                        <div className="text-gray-400 text-sm mb-2">Data Centers:</div>
+                        <div className="flex flex-wrap gap-2">
+                          {az["Data Centers"].split(',').map((dc, i) => (
+                            <span key={i} className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-3 py-1 rounded-full text-xs font-mono">
+                              {dc.trim()}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     </div>

@@ -12,6 +12,7 @@
   "CDG": "eu-west-3",
   "FRA": "eu-central-1",
   "ZRH": "eu-central-2",
+  "LUX": "eu-central-3",
   "ARN": "eu-north-1",
   "MXP": "eu-south-1",
   "ZAZ": "eu-south-2",
@@ -21,6 +22,7 @@
   "TLV": "il-central-1",
   "BOM": "ap-south-1",
   "HYD": "ap-south-2",
+  "BPM": "ap-south-3",
   "SIN": "ap-southeast-1",
   "SYD": "ap-southeast-2",
   "CGK": "ap-southeast-3",
@@ -35,6 +37,7 @@
   "KIX": "ap-northeast-3",
   "BJS": "cn-north-1",
   "ZHY": "cn-northwest-1",
+  "PEK": "cn-north-2",
   "QRO": "mx-central-1",
   "OSU": "us-gov-east-1",
   "PDT": "us-gov-west-1",
@@ -43,6 +46,5 @@
   "LCK": "us-isob-east-1",
   "LTW": "us-isof-east-1",
   "ALE": "us-isof-south-1",
-  "NCL": "eu-isoe-west-1",
-  "LUX": "eu-central-3"
+  "NCL": "eu-isoe-west-1"
 }
