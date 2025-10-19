@@ -150,26 +150,26 @@ export default function Home() {
                 <button
                   key={region.code}
                   onClick={(e) => handleRegionClick(region, e)}
-                  className={`w-full text-left p-4 rounded-lg mb-2 transition-all ${
+                  className={`group w-full text-left p-4 rounded-lg mb-2 transition-all ${
                     selectedRegions.has(region.code)
-                      ? "bg-cyan-500/20 border border-cyan-500/50"
-                      : "bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 hover:bg-[#1f1f1f]"
+                      ? "bg-cyan-500/20 border border-cyan-500/50 shadow-lg shadow-cyan-500/20"
+                      : "bg-[#1a1a1a] border border-gray-800 hover:border-cyan-500/30 hover:bg-[#1f1f1f] hover:shadow-lg hover:shadow-cyan-500/10"
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     {region.country && getCountryFlag(region.country) ? (
-                      <div className="w-10 h-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+                      <div className="w-10 h-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl group-hover:scale-110 transition-transform">
                         {getCountryFlag(region.country)}
                       </div>
                     ) : (
-                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-white mb-1">{region.name}</div>
+                      <div className="font-semibold text-white mb-1 truncate">{region.name}</div>
                       <div className="text-xs text-gray-400 font-mono">{region.code}</div>
                     </div>
                     <button
@@ -177,7 +177,7 @@ export default function Home() {
                         e.stopPropagation()
                         setDetailsPanelRegion(region)
                       }}
-                      className="text-gray-400 hover:text-cyan-400 transition-all"
+                      className="text-gray-400 hover:text-cyan-400 hover:scale-110 transition-all active:scale-95"
                       title="View details"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +235,7 @@ export default function Home() {
       {/* Globe Container - Full Screen */}
       <div className="flex-1 relative h-screen bg-[#0a0a0a]">
         {/* Selected Regions Info Cards */}
-        <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap gap-3 max-h-[calc(100vh-8rem)] overflow-y-auto">
+        <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap gap-3 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/50 scrollbar-track-transparent">
           {Array.from(selectedRegions).map((code, index) => {
             const region = regions.find(r => r.code === code)
             if (!region) return null
@@ -244,9 +244,10 @@ export default function Home() {
               <div
                 key={code}
                 ref={isMainSelected ? modalRef : null}
-                className="bg-[#111111]/95 backdrop-blur-sm border-2 border-cyan-500 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px] relative"
+                className="bg-[#111111]/95 backdrop-blur-sm border-2 border-cyan-500 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px] relative animate-in slide-in-from-top-4 duration-300"
                 style={{
-                  boxShadow: '0 0 50px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 0.4), 0 0 15px rgba(34, 211, 238, 0.3)'
+                  boxShadow: '0 0 50px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 0.4), 0 0 15px rgba(34, 211, 238, 0.3)',
+                  animationDelay: `${index * 50}ms`
                 }}
               >
                 <div className="flex items-start gap-3 mb-3">
@@ -266,10 +267,10 @@ export default function Home() {
                     <div className="text-white font-semibold">{region.name}</div>
                     <div className="text-xs text-gray-400 font-mono mt-1">{region.code}</div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => setDetailsPanelRegion(region)}
-                      className="text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 rounded p-1 transition-all cursor-pointer"
+                      className="text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 rounded p-1.5 transition-all cursor-pointer hover:scale-110 active:scale-95"
                       title="View details"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +286,8 @@ export default function Home() {
                           setSelectedRegion(null)
                         }
                       }}
-                      className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded p-1 transition-all cursor-pointer"
+                      className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded p-1.5 transition-all cursor-pointer hover:scale-110 active:scale-95"
+                      title="Remove"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
