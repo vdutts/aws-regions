@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef } from "react"
 import RotatingEarth from "@/components/rotating-earth"
+import RegionDetailsPanel from "@/components/region-details-panel"
 
 interface AWSRegion {
   name: string
   code: string
+  city: string
+  country: string
   lat: number
   lng: number
   info: string[]
@@ -20,6 +23,7 @@ export default function Home() {
   const [isResizing, setIsResizing] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | null>(null)
+  const [detailsPanelRegion, setDetailsPanelRegion] = useState<AWSRegion | null>(null)
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -168,6 +172,18 @@ export default function Home() {
                       <div className="font-semibold text-white mb-1">{region.name}</div>
                       <div className="text-xs text-gray-400 font-mono">{region.code}</div>
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setDetailsPanelRegion(region)
+                      }}
+                      className="text-gray-400 hover:text-cyan-400 transition-all"
+                      title="View details"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
                   </div>
                 </button>
               ))
@@ -250,21 +266,32 @@ export default function Home() {
                     <div className="text-white font-semibold">{region.name}</div>
                     <div className="text-xs text-gray-400 font-mono mt-1">{region.code}</div>
                   </div>
-                  <button
-                    onClick={() => {
-                      const newSelected = new Set(selectedRegions)
-                      newSelected.delete(code)
-                      setSelectedRegions(newSelected)
-                      if (selectedRegion?.code === code) {
-                        setSelectedRegion(null)
-                      }
-                    }}
-                    className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded p-1 transition-all cursor-pointer"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setDetailsPanelRegion(region)}
+                      className="text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 rounded p-1 transition-all cursor-pointer"
+                      title="View details"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newSelected = new Set(selectedRegions)
+                        newSelected.delete(code)
+                        setSelectedRegions(newSelected)
+                        if (selectedRegion?.code === code) {
+                          setSelectedRegion(null)
+                        }
+                      }}
+                      className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded p-1 transition-all cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -286,6 +313,14 @@ export default function Home() {
           <RotatingEarth width={2000} height={2000} selectedRegion={selectedRegion} modalPosition={modalPosition} />
         </div>
       </div>
+
+      {/* Details Panel */}
+      {detailsPanelRegion && (
+        <RegionDetailsPanel
+          region={detailsPanelRegion}
+          onClose={() => setDetailsPanelRegion(null)}
+        />
+      )}
     </main>
   )
 }
