@@ -9,10 +9,25 @@ interface RotatingEarthProps {
   className?: string
 }
 
+interface AWSRegion {
+  name: string
+  code: string
+  lat: number
+  lng: number
+  info: string[]
+}
+
+interface TooltipData {
+  region: AWSRegion
+  x: number
+  y: number
+}
+
 export default function RotatingEarth({ width = 800, height = 600, className = "" }: RotatingEarthProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [tooltip, setTooltip] = useState<TooltipData | null>(null)
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -131,6 +146,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
     const allDots: DotData[] = []
     let landFeatures: any
+    let awsRegions: AWSRegion[] = []
 
     const render = () => {
       // Clear canvas
@@ -184,6 +200,41 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
             context.fill()
           }
         })
+
+        // Draw AWS region markers
+        awsRegions.forEach((region) => {
+          const projected = projection([region.lng, region.lat])
+          if (projected) {
+            const [x, y] = projected
+            // Check if point is on visible side of globe
+            const distance = projection.rotate()
+            const lambda = region.lng + distance[0]
+            const phi = region.lat - distance[1]
+            const cosc = Math.sin(phi * Math.PI / 180) * Math.sin(0) + 
+                        Math.cos(phi * Math.PI / 180) * Math.cos(0) * Math.cos(lambda * Math.PI / 180)
+            
+            if (cosc > 0) {
+              // Draw outer glow
+              const gradient = context.createRadialGradient(x, y, 0, x, y, 12 * scaleFactor)
+              gradient.addColorStop(0, "rgba(34, 211, 238, 0.8)")
+              gradient.addColorStop(0.5, "rgba(34, 211, 238, 0.4)")
+              gradient.addColorStop(1, "rgba(34, 211, 238, 0)")
+              context.beginPath()
+              context.arc(x, y, 12 * scaleFactor, 0, 2 * Math.PI)
+              context.fillStyle = gradient
+              context.fill()
+
+              // Draw main marker dot
+              context.beginPath()
+              context.arc(x, y, 5 * scaleFactor, 0, 2 * Math.PI)
+              context.fillStyle = "#22d3ee"
+              context.fill()
+              context.strokeStyle = "#ffffff"
+              context.lineWidth = 2 * scaleFactor
+              context.stroke()
+            }
+          }
+        })
       }
     }
 
@@ -191,12 +242,20 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       try {
         setIsLoading(true)
 
+        // Load land data
         const response = await fetch(
           "https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/110m/physical/ne_110m_land.json",
         )
         if (!response.ok) throw new Error("Failed to load land data")
 
         landFeatures = await response.json()
+
+        // Load AWS regions data
+        const regionsResponse = await fetch("/aws-regions.json")
+        if (regionsResponse.ok) {
+          awsRegions = await regionsResponse.json()
+          console.log(`[v0] Loaded ${awsRegions.length} AWS regions`)
+        }
 
         // Generate dots for all land features
         let totalDots = 0
@@ -220,7 +279,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
     // Set up rotation and interaction
     const rotation = [0, 0]
-    let autoRotate = true
+    let autoRotate = false
     const rotationSpeed = 0.5
 
     const rotate = () => {
@@ -234,13 +293,84 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     // Auto-rotation timer
     const rotationTimer = d3.timer(rotate)
 
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const mouseX = event.clientX - rect.left
+      const mouseY = event.clientY - rect.top
+
+      // Check if hovering over any AWS region
+      let hoveredRegion: AWSRegion | null = null
+      for (const region of awsRegions) {
+        const projected = projection([region.lng, region.lat])
+        if (projected) {
+          const [x, y] = projected
+          const distance = projection.rotate()
+          const lambda = region.lng + distance[0]
+          const phi = region.lat - distance[1]
+          const cosc = Math.sin(phi * Math.PI / 180) * Math.sin(0) + 
+                      Math.cos(phi * Math.PI / 180) * Math.cos(0) * Math.cos(lambda * Math.PI / 180)
+          
+          if (cosc > 0) {
+            const dx = mouseX - x
+            const dy = mouseY - y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist < 12) {
+              hoveredRegion = region
+              break
+            }
+          }
+        }
+      }
+
+      if (hoveredRegion) {
+        canvas.style.cursor = "pointer"
+        setTooltip({
+          region: hoveredRegion,
+          x: event.clientX,
+          y: event.clientY
+        })
+      } else {
+        canvas.style.cursor = "grab"
+        setTooltip(null)
+      }
+    }
+
     const handleMouseDown = (event: MouseEvent) => {
+      // Check if clicking on a region
+      const rect = canvas.getBoundingClientRect()
+      const mouseX = event.clientX - rect.left
+      const mouseY = event.clientY - rect.top
+
+      for (const region of awsRegions) {
+        const projected = projection([region.lng, region.lat])
+        if (projected) {
+          const [x, y] = projected
+          const distance = projection.rotate()
+          const lambda = region.lng + distance[0]
+          const phi = region.lat - distance[1]
+          const cosc = Math.sin(phi * Math.PI / 180) * Math.sin(0) + 
+                      Math.cos(phi * Math.PI / 180) * Math.cos(0) * Math.cos(lambda * Math.PI / 180)
+          
+          if (cosc > 0) {
+            const dx = mouseX - x
+            const dy = mouseY - y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist < 12) {
+              // Clicked on a region - don't start dragging
+              return
+            }
+          }
+        }
+      }
+
+      // Start dragging
       autoRotate = false
+      canvas.style.cursor = "grabbing"
       const startX = event.clientX
       const startY = event.clientY
       const startRotation = [...rotation]
 
-      const handleMouseMove = (moveEvent: MouseEvent) => {
+      const handleMouseMoveWhileDragging = (moveEvent: MouseEvent) => {
         const sensitivity = 0.5
         const dx = moveEvent.clientX - startX
         const dy = moveEvent.clientY - startY
@@ -254,15 +384,12 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       }
 
       const handleMouseUp = () => {
-        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mousemove", handleMouseMoveWhileDragging)
         document.removeEventListener("mouseup", handleMouseUp)
-
-        setTimeout(() => {
-          autoRotate = true
-        }, 10)
+        canvas.style.cursor = "grab"
       }
 
-      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mousemove", handleMouseMoveWhileDragging)
       document.addEventListener("mouseup", handleMouseUp)
     }
 
@@ -274,6 +401,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       render()
     }
 
+    canvas.addEventListener("mousemove", handleMouseMove)
     canvas.addEventListener("mousedown", handleMouseDown)
     canvas.addEventListener("wheel", handleWheel)
 
@@ -283,6 +411,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     // Cleanup
     return () => {
       rotationTimer.stop()
+      canvas.removeEventListener("mousemove", handleMouseMove)
       canvas.removeEventListener("mousedown", handleMouseDown)
       canvas.removeEventListener("wheel", handleWheel)
     }
@@ -309,6 +438,40 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       <div className="absolute bottom-4 left-4 text-xs text-muted-foreground px-2 py-1 rounded-md dark bg-neutral-900">
         Drag to rotate • Scroll to zoom
       </div>
+      
+      {tooltip && (
+        <div
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: `${tooltip.x + 20}px`,
+            top: `${tooltip.y - 80}px`,
+          }}
+        >
+          <div className="bg-neutral-900 border border-cyan-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-xs text-cyan-400 font-medium mb-1">Region</div>
+                <div className="text-white font-semibold">{tooltip.region.name}</div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="text-sm text-gray-300 font-medium">Your free plan includes:</div>
+              {tooltip.region.info.map((item, idx) => (
+                <div key={idx} className="text-sm text-gray-400 flex items-start gap-2">
+                  <span className="text-cyan-400 mt-0.5">•</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
