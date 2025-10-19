@@ -32,6 +32,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   const projectionRef = useRef<any>(null)
   const rotationRef = useRef<number[]>([0, 0])
   const renderRef = useRef<(() => void) | null>(null)
+  const [pulsePhase, setPulsePhase] = useState(0)
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -219,24 +220,108 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
                         Math.cos(phi * Math.PI / 180) * Math.cos(0) * Math.cos(lambda * Math.PI / 180)
             
             if (cosc > 0) {
-              // Draw outer glow
-              const gradient = context.createRadialGradient(x, y, 0, x, y, 12 * scaleFactor)
-              gradient.addColorStop(0, "rgba(34, 211, 238, 0.8)")
-              gradient.addColorStop(0.5, "rgba(34, 211, 238, 0.4)")
-              gradient.addColorStop(1, "rgba(34, 211, 238, 0)")
-              context.beginPath()
-              context.arc(x, y, 12 * scaleFactor, 0, 2 * Math.PI)
-              context.fillStyle = gradient
-              context.fill()
+              const isSelected = selectedRegion?.code === region.code
+              
+              if (isSelected) {
+                // MASSIVE pulsing animation for selected region
+                const pulseSize = 50 + Math.sin(pulsePhase) * 20
+                const pulseOpacity = 0.9 + Math.sin(pulsePhase) * 0.1
+                
+                // Draw HUGE pulsing outer glow - PURE GOLD
+                const outerGradient = context.createRadialGradient(x, y, 0, x, y, pulseSize * scaleFactor)
+                outerGradient.addColorStop(0, `rgba(255, 223, 0, ${pulseOpacity})`)
+                outerGradient.addColorStop(0.2, `rgba(255, 215, 0, ${pulseOpacity * 0.9})`)
+                outerGradient.addColorStop(0.5, `rgba(255, 200, 0, ${pulseOpacity * 0.6})`)
+                outerGradient.addColorStop(1, "rgba(255, 215, 0, 0)")
+                context.beginPath()
+                context.arc(x, y, pulseSize * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = outerGradient
+                context.fill()
+                
+                // Draw multiple animated GOLD rings
+                for (let i = 0; i < 4; i++) {
+                  const offset = (pulsePhase + i * Math.PI / 2) % (Math.PI * 2)
+                  const ringSize = 25 + Math.sin(offset) * 15
+                  const ringOpacity = 0.7 + Math.sin(offset) * 0.3
+                  context.beginPath()
+                  context.arc(x, y, ringSize * scaleFactor, 0, 2 * Math.PI)
+                  context.strokeStyle = `rgba(255, 215, 0, ${ringOpacity})`
+                  context.lineWidth = 4 * scaleFactor
+                  context.stroke()
+                }
+                
+                // Draw super bright GOLD center glow
+                const centerGradient = context.createRadialGradient(x, y, 0, x, y, 20 * scaleFactor)
+                centerGradient.addColorStop(0, "rgba(255, 255, 100, 1)")
+                centerGradient.addColorStop(0.3, "rgba(255, 215, 0, 0.9)")
+                centerGradient.addColorStop(0.7, "rgba(255, 200, 0, 0.5)")
+                centerGradient.addColorStop(1, "rgba(255, 215, 0, 0)")
+                context.beginPath()
+                context.arc(x, y, 20 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = centerGradient
+                context.fill()
+              } else {
+                // Draw outer glow for non-selected
+                const gradient = context.createRadialGradient(x, y, 0, x, y, 12 * scaleFactor)
+                gradient.addColorStop(0, "rgba(34, 211, 238, 0.8)")
+                gradient.addColorStop(0.5, "rgba(34, 211, 238, 0.4)")
+                gradient.addColorStop(1, "rgba(34, 211, 238, 0)")
+                context.beginPath()
+                context.arc(x, y, 12 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = gradient
+                context.fill()
+              }
 
-              // Draw main marker dot
-              context.beginPath()
-              context.arc(x, y, 5 * scaleFactor, 0, 2 * Math.PI)
-              context.fillStyle = "#22d3ee"
-              context.fill()
-              context.strokeStyle = "#ffffff"
-              context.lineWidth = 2 * scaleFactor
-              context.stroke()
+              // Draw main marker dot (HUGE and BRIGHT GOLD for selected)
+              if (isSelected) {
+                // Outer bright gold ring
+                context.beginPath()
+                context.arc(x, y, 16 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = "#ffed4e"
+                context.fill()
+                
+                // Middle gold layer
+                context.beginPath()
+                context.arc(x, y, 11 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = "#ffd700"
+                context.fill()
+                
+                // Inner bright layer
+                context.beginPath()
+                context.arc(x, y, 7 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = "#ffeb3b"
+                context.fill()
+                
+                // White center dot
+                context.beginPath()
+                context.arc(x, y, 4 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = "#ffffff"
+                context.fill()
+                
+                // White outer stroke for contrast
+                context.beginPath()
+                context.arc(x, y, 16 * scaleFactor, 0, 2 * Math.PI)
+                context.strokeStyle = "#ffffff"
+                context.lineWidth = 4 * scaleFactor
+                context.stroke()
+                
+                // Add label text next to marker
+                context.font = `bold ${14 * scaleFactor}px Arial`
+                context.fillStyle = "#ffd700"
+                context.strokeStyle = "#000000"
+                context.lineWidth = 3
+                context.strokeText(region.code, x + 25 * scaleFactor, y + 5 * scaleFactor)
+                context.fillText(region.code, x + 25 * scaleFactor, y + 5 * scaleFactor)
+              } else {
+                // Normal cyan marker
+                context.beginPath()
+                context.arc(x, y, 5 * scaleFactor, 0, 2 * Math.PI)
+                context.fillStyle = "#22d3ee"
+                context.fill()
+                context.strokeStyle = "#ffffff"
+                context.lineWidth = 2 * scaleFactor
+                context.stroke()
+              }
             }
           }
         })
@@ -472,6 +557,34 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     }
 
     animate()
+  }, [selectedRegion])
+
+  // Pulse animation for selected markers - continuous animation
+  useEffect(() => {
+    if (!selectedRegion) return
+    
+    let animationFrame: number
+    let lastTime = Date.now()
+    
+    const animate = () => {
+      const now = Date.now()
+      const delta = (now - lastTime) / 16.67 // Normalize to ~60fps
+      lastTime = now
+      
+      setPulsePhase(prev => (prev + 0.08 * delta) % (Math.PI * 2))
+      
+      if (renderRef.current) {
+        renderRef.current()
+      }
+      
+      animationFrame = requestAnimationFrame(animate)
+    }
+    
+    animationFrame = requestAnimationFrame(animate)
+    
+    return () => {
+      cancelAnimationFrame(animationFrame)
+    }
   }, [selectedRegion])
 
   if (error) {

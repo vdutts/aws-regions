@@ -18,6 +18,7 @@ export default function Home() {
   const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set())
   const [sidebarWidth, setSidebarWidth] = useState(420)
   const [isResizing, setIsResizing] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     fetch("/aws-regions.json")
@@ -77,18 +78,29 @@ export default function Home() {
     }
   }, [isResizing])
 
+  const getCountryFlag = (countryCode: string) => {
+    if (!countryCode || countryCode.length !== 2) return null
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0))
+    return String.fromCodePoint(...codePoints)
+  }
+
   return (
     <main className="h-screen w-screen bg-[#0a0a0a] flex overflow-hidden">
       {/* Sidebar */}
       <div 
-        className="bg-[#111111] border-r border-gray-800 flex flex-col h-screen relative"
-        style={{ width: `${sidebarWidth}px` }}
+        className="bg-[#111111] border-r border-gray-800 flex flex-col h-screen relative transition-all duration-300"
+        style={{ width: isSidebarCollapsed ? '0px' : `${sidebarWidth}px` }}
       >
-        {/* Header */}
-        <div className="p-6 border-b border-gray-800">
-          <h1 className="text-2xl font-bold text-white mb-2">AWS Regions</h1>
-          <p className="text-gray-400 text-sm">Explore datacenter locations worldwide</p>
-        </div>
+        {!isSidebarCollapsed && (
+          <>
+            {/* Header */}
+            <div className="p-6 border-b border-gray-800">
+              <h1 className="text-2xl font-bold text-white mb-2">AWS Regions</h1>
+              <p className="text-gray-400 text-sm">Explore datacenter locations worldwide</p>
+            </div>
 
         {/* Search */}
         <div className="p-4 border-b border-gray-800">
@@ -125,11 +137,17 @@ export default function Home() {
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
+                    {region.country && getCountryFlag(region.country) ? (
+                      <div className="w-10 h-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+                        {getCountryFlag(region.country)}
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-white mb-1">{region.name}</div>
                       <div className="text-xs text-gray-400 font-mono">{region.code}</div>
@@ -155,14 +173,32 @@ export default function Home() {
           )}
         </div>
 
-        {/* Resize Handle */}
-        <div
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-cyan-500/50 transition-colors group"
-          onMouseDown={handleMouseDown}
-        >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-gray-700 group-hover:bg-cyan-500 transition-colors rounded-full" />
-        </div>
+            {/* Resize Handle */}
+            <div
+              className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-cyan-500/30 transition-colors group z-20"
+              onMouseDown={handleMouseDown}
+            >
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-16 bg-gray-700 group-hover:bg-cyan-500 transition-colors rounded-full shadow-lg" />
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Collapse/Expand Button */}
+      <button
+        onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-[#111111] hover:bg-cyan-500/20 border border-gray-800 hover:border-cyan-500 rounded-r-lg p-2 transition-all duration-300 group"
+        style={{ left: isSidebarCollapsed ? '0px' : `${sidebarWidth}px` }}
+      >
+        <svg 
+          className={`w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-all duration-300 ${isSidebarCollapsed ? '' : 'rotate-180'}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
 
       {/* Globe Container - Full Screen */}
       <div className="flex-1 relative h-screen bg-[#0a0a0a]">
@@ -174,16 +210,25 @@ export default function Home() {
             return (
               <div
                 key={code}
-                className="bg-[#111111]/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px]"
+                className="bg-[#111111]/95 backdrop-blur-sm border-2 border-yellow-500 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px] relative"
+                style={{
+                  boxShadow: '0 0 50px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.3)'
+                }}
               >
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                    </svg>
-                  </div>
+                  {region.country && getCountryFlag(region.country) ? (
+                    <div className="w-10 h-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+                      {getCountryFlag(region.country)}
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="flex-1">
-                    <div className="text-xs text-cyan-400 font-medium mb-1">Region</div>
+                    <div className="text-xs text-yellow-400 font-medium mb-1">Region</div>
                     <div className="text-white font-semibold">{region.name}</div>
                     <div className="text-xs text-gray-400 font-mono mt-1">{region.code}</div>
                   </div>
@@ -196,7 +241,7 @@ export default function Home() {
                         setSelectedRegion(null)
                       }
                     }}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded p-1 transition-all cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -205,10 +250,10 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="text-sm text-gray-300 font-medium">Region Details:</div>
+                  <div className="text-sm text-yellow-400 font-medium">Region Details:</div>
                   {region.info.map((item, idx) => (
-                    <div key={idx} className="text-sm text-gray-400 flex items-start gap-2">
-                      <span className="text-cyan-400 mt-0.5">•</span>
+                    <div key={idx} className="text-sm text-gray-300 flex items-start gap-2">
+                      <span className="text-yellow-400 mt-0.5">•</span>
                       <span>{item}</span>
                     </div>
                   ))}
