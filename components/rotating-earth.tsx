@@ -475,13 +475,13 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative w-full h-full ${className}`}>
       <canvas
         ref={canvasRef}
-        className="w-full h-auto rounded-2xl bg-background dark"
-        style={{ maxWidth: "100%", height: "auto" }}
+        className="w-full h-full"
+        style={{ display: "block" }}
       />
-      <div className="absolute bottom-4 left-4 text-xs text-muted-foreground px-2 py-1 rounded-md dark bg-neutral-900">
+      <div className="absolute bottom-4 right-4 text-xs text-gray-400 px-3 py-2 rounded-lg bg-[#111111]/80 backdrop-blur-sm border border-gray-800">
         Drag to rotate • Scroll to zoom
       </div>
       
@@ -493,10 +493,10 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
             top: `${tooltip.y - 80}px`,
           }}
         >
-          <div className="bg-neutral-900 border border-cyan-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
+          <div className="bg-[#111111]/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
             <div className="flex items-start gap-3 mb-3">
-              <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
               </div>
@@ -507,7 +507,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
             </div>
             
             <div className="space-y-2">
-              <div className="text-sm text-gray-300 font-medium">Your free plan includes:</div>
+              <div className="text-sm text-gray-300 font-medium">Region Details:</div>
               {tooltip.region.info.map((item, idx) => (
                 <div key={idx} className="text-sm text-gray-400 flex items-start gap-2">
                   <span className="text-cyan-400 mt-0.5">•</span>

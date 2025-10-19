@@ -29,13 +29,13 @@ export default function Home() {
   )
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] flex">
+    <main className="h-screen w-screen bg-[#0a0a0a] flex overflow-hidden">
       {/* Sidebar */}
-      <div className="w-96 bg-[#111111] border-r border-gray-800 flex flex-col">
+      <div className="w-[420px] bg-[#111111] border-r border-gray-800 flex flex-col h-screen">
         {/* Header */}
         <div className="p-6 border-b border-gray-800">
           <h1 className="text-2xl font-bold text-white mb-2">AWS Regions</h1>
-          <p className="text-gray-400 text-sm">Explore AWS datacenter locations worldwide</p>
+          <p className="text-gray-400 text-sm">Explore datacenter locations worldwide</p>
         </div>
 
         {/* Search */}
@@ -49,16 +49,16 @@ export default function Home() {
               placeholder="Search regions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full bg-[#1a1a1a] border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
           </div>
         </div>
 
         {/* Region List */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-2">
+          <div className="p-3">
             {filteredRegions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-12 text-gray-500">
                 {searchQuery ? "No regions found" : "Loading regions..."}
               </div>
             ) : (
@@ -98,36 +98,30 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Globe Container */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <div className="h-16 bg-[#111111] border-b border-gray-800 flex items-center px-6">
-          {selectedRegion ? (
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                <div>
-                  <div className="text-white font-semibold">{selectedRegion.name}</div>
-                  <div className="text-xs text-gray-400">{selectedRegion.code}</div>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedRegion(null)}
-                className="ml-4 text-gray-400 hover:text-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+      {/* Globe Container - Full Screen */}
+      <div className="flex-1 relative h-screen bg-[#0a0a0a]">
+        {/* Top Bar - Floating */}
+        {selectedRegion && (
+          <div className="absolute top-4 left-4 z-10 bg-[#111111]/90 backdrop-blur-sm border border-gray-800 rounded-lg px-4 py-3 flex items-center gap-3">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+            <div>
+              <div className="text-white font-semibold text-sm">{selectedRegion.name}</div>
+              <div className="text-xs text-gray-400">{selectedRegion.code}</div>
             </div>
-          ) : (
-            <div className="text-gray-400 text-sm">Select a region to view details</div>
-          )}
-        </div>
+            <button
+              onClick={() => setSelectedRegion(null)}
+              className="ml-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
 
-        {/* Globe */}
-        <div className="flex-1 flex items-center justify-center p-8">
-          <RotatingEarth width={900} height={700} selectedRegion={selectedRegion} />
+        {/* Globe - Full Screen */}
+        <div className="w-full h-full flex items-center justify-center">
+          <RotatingEarth width={2000} height={2000} selectedRegion={selectedRegion} />
         </div>
       </div>
     </main>
