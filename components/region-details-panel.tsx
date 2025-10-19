@@ -151,7 +151,7 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg p-2 transition-all hover:scale-110 active:scale-95"
+              className="text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg p-2 transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -164,7 +164,7 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
         <div className="flex border-b border-gray-800 bg-[#111111] overflow-x-auto">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap ${
+            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
               activeTab === "overview"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
@@ -179,7 +179,7 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
           </button>
           <button
             onClick={() => setActiveTab("azs")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap ${
+            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
               activeTab === "azs"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
@@ -197,7 +197,7 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
           </button>
           <button
             onClick={() => setActiveTab("local")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap ${
+            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
               activeTab === "local"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
@@ -216,7 +216,7 @@ export default function RegionDetailsPanel({ region, onClose }: RegionDetailsPan
           </button>
           <button
             onClick={() => setActiveTab("partition")}
-            className={`px-6 py-3 font-medium transition-all whitespace-nowrap ${
+            className={`px-6 py-3 font-medium transition-all whitespace-nowrap cursor-pointer ${
               activeTab === "partition"
                 ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/10"
                 : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"

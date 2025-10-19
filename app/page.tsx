@@ -170,7 +170,7 @@ export default function Home() {
                 <button
                   key={region.code}
                   onClick={(e) => handleRegionClick(region, e)}
-                  className={`group w-full text-left p-4 rounded-lg mb-2 transition-all ${
+                  className={`group w-full text-left p-4 rounded-lg mb-2 transition-all cursor-pointer ${
                     selectedRegions.has(region.code)
                       ? "bg-cyan-500/20 border border-cyan-500/50 shadow-lg shadow-cyan-500/20"
                       : "bg-[#1a1a1a] border border-gray-800 hover:border-cyan-500/30 hover:bg-[#1f1f1f] hover:shadow-lg hover:shadow-cyan-500/10"
@@ -200,7 +200,7 @@ export default function Home() {
                         e.stopPropagation()
                         setDetailsPanelRegion(region)
                       }}
-                      className="text-gray-400 hover:text-cyan-400 hover:scale-110 transition-all active:scale-95"
+                      className="text-gray-400 hover:text-cyan-400 hover:scale-110 transition-all active:scale-95 cursor-pointer"
                       title="View details"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,7 +242,7 @@ export default function Home() {
       {/* Collapse/Expand Button */}
       <button
         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-[#111111] hover:bg-cyan-500/20 border border-gray-800 hover:border-cyan-500 rounded-r-lg p-2 transition-all duration-300 group"
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-[#111111] hover:bg-cyan-500/20 border border-gray-800 hover:border-cyan-500 rounded-r-lg p-2 transition-all duration-300 group cursor-pointer"
         style={{ left: isSidebarCollapsed ? '0px' : `${sidebarWidth}px` }}
       >
         <svg 
