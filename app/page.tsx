@@ -59,10 +59,57 @@ export default function Home() {
     }
   }, [selectedRegion, selectedRegions])
 
-  const filteredRegions = regions.filter(region =>
-    region.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    region.code.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Helper function to get AWS region identifier
+  const getAwsRegionId = (region: AWSRegion): string | null => {
+    // Create a unique key using code and partition info
+    const partitionInfo = region.info.find(i => i.startsWith("Partition:"))
+    const partition = partitionInfo ? partitionInfo.split(": ")[1] : ""
+    
+    // Try to find mapping using code-partition combination first
+    const uniqueKey = `${region.code}-${partition}`
+    const mappedCode = regionCodeMapping[uniqueKey] || regionCodeMapping[region.code]
+    
+    if (mappedCode && regionIdentifiers[mappedCode]) {
+      return regionIdentifiers[mappedCode]
+    }
+    return null
+  }
+
+  // Filter and sort regions with priority for AWS region ID matches
+  const filteredRegions = regions.filter(region => {
+    const query = searchQuery.toLowerCase()
+    const awsId = getAwsRegionId(region)
+    return (
+      region.name.toLowerCase().includes(query) ||
+      region.code.toLowerCase().includes(query) ||
+      (awsId && awsId.toLowerCase().includes(query))
+    )
+  }).sort((a, b) => {
+    const query = searchQuery.toLowerCase()
+    if (!query) return 0
+    
+    const aAwsId = getAwsRegionId(a)?.toLowerCase() || ''
+    const bAwsId = getAwsRegionId(b)?.toLowerCase() || ''
+    
+    // Priority 1: Exact AWS region ID match
+    if (aAwsId === query && bAwsId !== query) return -1
+    if (bAwsId === query && aAwsId !== query) return 1
+    
+    // Priority 2: AWS region ID starts with query
+    if (aAwsId.startsWith(query) && !bAwsId.startsWith(query)) return -1
+    if (bAwsId.startsWith(query) && !aAwsId.startsWith(query)) return 1
+    
+    // Priority 3: AWS region ID contains query
+    if (aAwsId.includes(query) && !bAwsId.includes(query)) return -1
+    if (bAwsId.includes(query) && !aAwsId.includes(query)) return 1
+    
+    // Priority 4: Region name starts with query
+    if (a.name.toLowerCase().startsWith(query) && !b.name.toLowerCase().startsWith(query)) return -1
+    if (b.name.toLowerCase().startsWith(query) && !a.name.toLowerCase().startsWith(query)) return 1
+    
+    // Default: alphabetical by name
+    return a.name.localeCompare(b.name)
+  })
 
   const handleRegionClick = (region: AWSRegion, event: React.MouseEvent) => {
     if (event.metaKey || event.ctrlKey) {
@@ -119,13 +166,6 @@ export default function Home() {
     return String.fromCodePoint(...codePoints)
   }
 
-  const getAwsRegionId = (region: AWSRegion) => {
-    const mappedCode = regionCodeMapping[region.code]
-    if (mappedCode && regionIdentifiers[mappedCode]) {
-      return regionIdentifiers[mappedCode]
-    }
-    return null
-  }
 
   return (
     <main className="h-screen w-screen bg-[#0a0a0a] flex overflow-hidden">
