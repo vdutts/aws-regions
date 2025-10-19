@@ -24,6 +24,8 @@ export default function Home() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | null>(null)
   const [detailsPanelRegion, setDetailsPanelRegion] = useState<AWSRegion | null>(null)
+  const [regionCodeMapping, setRegionCodeMapping] = useState<Record<string, string>>({})
+  const [regionIdentifiers, setRegionIdentifiers] = useState<Record<string, string>>({})
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -31,6 +33,16 @@ export default function Home() {
       .then(res => res.json())
       .then(data => setRegions(data))
       .catch(err => console.error("Failed to load regions:", err))
+    
+    fetch("/region-code-mapping.json")
+      .then(res => res.json())
+      .then(data => setRegionCodeMapping(data))
+      .catch(err => console.error("Failed to load region code mapping:", err))
+    
+    fetch("/aws-region-identifiers.json")
+      .then(res => res.json())
+      .then(data => setRegionIdentifiers(data))
+      .catch(err => console.error("Failed to load region identifiers:", err))
   }, [])
 
   // Update modal position whenever the modal is rendered
@@ -107,6 +119,14 @@ export default function Home() {
     return String.fromCodePoint(...codePoints)
   }
 
+  const getAwsRegionId = (region: AWSRegion) => {
+    const mappedCode = regionCodeMapping[region.code]
+    if (mappedCode && regionIdentifiers[mappedCode]) {
+      return regionIdentifiers[mappedCode]
+    }
+    return null
+  }
+
   return (
     <main className="h-screen w-screen bg-[#0a0a0a] flex overflow-hidden">
       {/* Sidebar */}
@@ -170,6 +190,9 @@ export default function Home() {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-white mb-1 truncate">{region.name}</div>
+                      {getAwsRegionId(region) && (
+                        <div className="text-sm text-cyan-400 font-mono mb-0.5">{getAwsRegionId(region)}</div>
+                      )}
                       <div className="text-xs text-gray-400 font-mono">{region.code}</div>
                     </div>
                     <button
@@ -265,7 +288,10 @@ export default function Home() {
                   <div className="flex-1">
                     <div className="text-xs text-cyan-400 font-medium mb-1">Region</div>
                     <div className="text-white font-semibold">{region.name}</div>
-                    <div className="text-xs text-gray-400 font-mono mt-1">{region.code}</div>
+                    {getAwsRegionId(region) && (
+                      <div className="text-sm text-cyan-400 font-mono mt-1">{getAwsRegionId(region)}</div>
+                    )}
+                    <div className="text-xs text-gray-400 font-mono mt-0.5">{region.code}</div>
                   </div>
                   <div className="flex gap-1">
                     <button
