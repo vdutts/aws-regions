@@ -228,9 +228,9 @@ export default function Home() {
               <div
                 key={code}
                 ref={isMainSelected ? modalRef : null}
-                className="bg-[#111111]/95 backdrop-blur-sm border-2 border-yellow-500 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px] relative"
+                className="bg-[#111111]/95 backdrop-blur-sm border-2 border-cyan-500 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px] relative"
                 style={{
-                  boxShadow: '0 0 50px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.3)'
+                  boxShadow: '0 0 50px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 0.4), 0 0 15px rgba(34, 211, 238, 0.3)'
                 }}
               >
                 <div className="flex items-start gap-3 mb-3">
@@ -246,7 +246,7 @@ export default function Home() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <div className="text-xs text-yellow-400 font-medium mb-1">Region</div>
+                    <div className="text-xs text-cyan-400 font-medium mb-1">Region</div>
                     <div className="text-white font-semibold">{region.name}</div>
                     <div className="text-xs text-gray-400 font-mono mt-1">{region.code}</div>
                   </div>
@@ -268,10 +268,10 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="text-sm text-yellow-400 font-medium">Region Details:</div>
+                  <div className="text-sm text-cyan-400 font-medium">Region Details:</div>
                   {region.info.map((item, idx) => (
                     <div key={idx} className="text-sm text-gray-300 flex items-start gap-2">
-                      <span className="text-yellow-400 mt-0.5">•</span>
+                      <span className="text-cyan-400 mt-0.5">•</span>
                       <span>{item}</span>
                     </div>
                   ))}
