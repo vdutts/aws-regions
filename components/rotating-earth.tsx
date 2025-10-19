@@ -8,6 +8,7 @@ interface RotatingEarthProps {
   height?: number
   className?: string
   selectedRegion?: AWSRegion | null
+  modalPosition?: { x: number; y: number } | null
 }
 
 interface AWSRegion {
@@ -24,7 +25,7 @@ interface TooltipData {
   y: number
 }
 
-export default function RotatingEarth({ width = 800, height = 600, className = "", selectedRegion = null }: RotatingEarthProps) {
+export default function RotatingEarth({ width = 800, height = 600, className = "", selectedRegion = null, modalPosition = null }: RotatingEarthProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,6 +34,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   const rotationRef = useRef<number[]>([0, 0])
   const renderRef = useRef<(() => void) | null>(null)
   const [pulsePhase, setPulsePhase] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -227,35 +229,35 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
                 const pulseSize = 50 + Math.sin(pulsePhase) * 20
                 const pulseOpacity = 0.9 + Math.sin(pulsePhase) * 0.1
                 
-                // Draw HUGE pulsing outer glow - PURE GOLD
+                // Draw HUGE pulsing outer glow - CYAN
                 const outerGradient = context.createRadialGradient(x, y, 0, x, y, pulseSize * scaleFactor)
-                outerGradient.addColorStop(0, `rgba(255, 223, 0, ${pulseOpacity})`)
-                outerGradient.addColorStop(0.2, `rgba(255, 215, 0, ${pulseOpacity * 0.9})`)
-                outerGradient.addColorStop(0.5, `rgba(255, 200, 0, ${pulseOpacity * 0.6})`)
-                outerGradient.addColorStop(1, "rgba(255, 215, 0, 0)")
+                outerGradient.addColorStop(0, `rgba(34, 211, 238, ${pulseOpacity})`)
+                outerGradient.addColorStop(0.2, `rgba(34, 211, 238, ${pulseOpacity * 0.9})`)
+                outerGradient.addColorStop(0.5, `rgba(34, 211, 238, ${pulseOpacity * 0.6})`)
+                outerGradient.addColorStop(1, "rgba(34, 211, 238, 0)")
                 context.beginPath()
                 context.arc(x, y, pulseSize * scaleFactor, 0, 2 * Math.PI)
                 context.fillStyle = outerGradient
                 context.fill()
                 
-                // Draw multiple animated GOLD rings
+                // Draw multiple animated CYAN rings
                 for (let i = 0; i < 4; i++) {
                   const offset = (pulsePhase + i * Math.PI / 2) % (Math.PI * 2)
                   const ringSize = 25 + Math.sin(offset) * 15
                   const ringOpacity = 0.7 + Math.sin(offset) * 0.3
                   context.beginPath()
                   context.arc(x, y, ringSize * scaleFactor, 0, 2 * Math.PI)
-                  context.strokeStyle = `rgba(255, 215, 0, ${ringOpacity})`
+                  context.strokeStyle = `rgba(34, 211, 238, ${ringOpacity})`
                   context.lineWidth = 4 * scaleFactor
                   context.stroke()
                 }
                 
-                // Draw super bright GOLD center glow
+                // Draw super bright CYAN center glow
                 const centerGradient = context.createRadialGradient(x, y, 0, x, y, 20 * scaleFactor)
-                centerGradient.addColorStop(0, "rgba(255, 255, 100, 1)")
-                centerGradient.addColorStop(0.3, "rgba(255, 215, 0, 0.9)")
-                centerGradient.addColorStop(0.7, "rgba(255, 200, 0, 0.5)")
-                centerGradient.addColorStop(1, "rgba(255, 215, 0, 0)")
+                centerGradient.addColorStop(0, "rgba(100, 255, 255, 1)")
+                centerGradient.addColorStop(0.3, "rgba(34, 211, 238, 0.9)")
+                centerGradient.addColorStop(0.7, "rgba(34, 211, 238, 0.5)")
+                centerGradient.addColorStop(1, "rgba(34, 211, 238, 0)")
                 context.beginPath()
                 context.arc(x, y, 20 * scaleFactor, 0, 2 * Math.PI)
                 context.fillStyle = centerGradient
@@ -272,24 +274,24 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
                 context.fill()
               }
 
-              // Draw main marker dot (HUGE and BRIGHT GOLD for selected)
+              // Draw main marker dot (HUGE and BRIGHT CYAN for selected)
               if (isSelected) {
-                // Outer bright gold ring
+                // Outer bright cyan ring
                 context.beginPath()
                 context.arc(x, y, 16 * scaleFactor, 0, 2 * Math.PI)
-                context.fillStyle = "#ffed4e"
+                context.fillStyle = "#22d3ee"
                 context.fill()
                 
-                // Middle gold layer
+                // Middle cyan layer
                 context.beginPath()
                 context.arc(x, y, 11 * scaleFactor, 0, 2 * Math.PI)
-                context.fillStyle = "#ffd700"
+                context.fillStyle = "#06b6d4"
                 context.fill()
                 
                 // Inner bright layer
                 context.beginPath()
                 context.arc(x, y, 7 * scaleFactor, 0, 2 * Math.PI)
-                context.fillStyle = "#ffeb3b"
+                context.fillStyle = "#67e8f9"
                 context.fill()
                 
                 // White center dot
@@ -307,7 +309,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
                 
                 // Add label text next to marker
                 context.font = `bold ${14 * scaleFactor}px Arial`
-                context.fillStyle = "#ffd700"
+                context.fillStyle = "#22d3ee"
                 context.strokeStyle = "#000000"
                 context.lineWidth = 3
                 context.strokeText(region.code, x + 25 * scaleFactor, y + 5 * scaleFactor)
@@ -325,6 +327,32 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
             }
           }
         })
+
+        // Draw connector line from selected region to modal - LAST so it's on top
+        if (selectedRegion && modalPosition && containerRef.current) {
+          const projected = projection([selectedRegion.lng, selectedRegion.lat])
+          if (projected) {
+            const [dotX, dotY] = projected
+            const canvasRect = canvas.getBoundingClientRect()
+            
+            // Calculate modal position relative to canvas
+            const modalX = modalPosition.x - canvasRect.left
+            const modalY = modalPosition.y - canvasRect.top
+            
+            // Draw thick dashed line from dot to modal
+            context.save()
+            context.beginPath()
+            context.moveTo(dotX, dotY)
+            context.lineTo(modalX, modalY)
+            context.strokeStyle = "#22d3ee"
+            context.lineWidth = 4
+            context.setLineDash([15, 10])
+            context.shadowColor = "rgba(34, 211, 238, 1)"
+            context.shadowBlur = 20
+            context.stroke()
+            context.restore()
+          }
+        }
       }
     }
 
@@ -599,7 +627,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   }
 
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div ref={containerRef} className={`relative w-full h-full ${className}`}>
       <canvas
         ref={canvasRef}
         className="w-full h-full"
