@@ -15,6 +15,9 @@ export default function Home() {
   const [regions, setRegions] = useState<AWSRegion[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedRegion, setSelectedRegion] = useState<AWSRegion | null>(null)
+  const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set())
+  const [sidebarWidth, setSidebarWidth] = useState(420)
+  const [isResizing, setIsResizing] = useState(false)
 
   useEffect(() => {
     fetch("/aws-regions.json")
@@ -28,10 +31,59 @@ export default function Home() {
     region.code.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const handleRegionClick = (region: AWSRegion, event: React.MouseEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      // Multi-select with Cmd/Ctrl
+      const newSelected = new Set(selectedRegions)
+      if (newSelected.has(region.code)) {
+        newSelected.delete(region.code)
+      } else {
+        newSelected.add(region.code)
+      }
+      setSelectedRegions(newSelected)
+    } else {
+      // Single select - zoom to region
+      setSelectedRegion(region)
+      setSelectedRegions(new Set([region.code]))
+    }
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true)
+    e.preventDefault()
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return
+      const newWidth = e.clientX
+      if (newWidth >= 320 && newWidth <= 600) {
+        setSidebarWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+    }
+
+    if (isResizing) {
+      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mouseup", handleMouseUp)
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [isResizing])
+
   return (
     <main className="h-screen w-screen bg-[#0a0a0a] flex overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[420px] bg-[#111111] border-r border-gray-800 flex flex-col h-screen">
+      <div 
+        className="bg-[#111111] border-r border-gray-800 flex flex-col h-screen relative"
+        style={{ width: `${sidebarWidth}px` }}
+      >
         {/* Header */}
         <div className="p-6 border-b border-gray-800">
           <h1 className="text-2xl font-bold text-white mb-2">AWS Regions</h1>
@@ -65,9 +117,9 @@ export default function Home() {
               filteredRegions.map((region) => (
                 <button
                   key={region.code}
-                  onClick={() => setSelectedRegion(region)}
+                  onClick={(e) => handleRegionClick(region, e)}
                   className={`w-full text-left p-4 rounded-lg mb-2 transition-all ${
-                    selectedRegion?.code === region.code
+                    selectedRegions.has(region.code)
                       ? "bg-cyan-500/20 border border-cyan-500/50"
                       : "bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 hover:bg-[#1f1f1f]"
                   }`}
@@ -95,29 +147,76 @@ export default function Home() {
             <span className="text-gray-400">Total Regions</span>
             <span className="text-white font-semibold">{regions.length}</span>
           </div>
+          {selectedRegions.size > 0 && (
+            <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t border-gray-800">
+              <span className="text-cyan-400">Selected</span>
+              <span className="text-cyan-400 font-semibold">{selectedRegions.size}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Resize Handle */}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-cyan-500/50 transition-colors group"
+          onMouseDown={handleMouseDown}
+        >
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-gray-700 group-hover:bg-cyan-500 transition-colors rounded-full" />
         </div>
       </div>
 
       {/* Globe Container - Full Screen */}
       <div className="flex-1 relative h-screen bg-[#0a0a0a]">
-        {/* Top Bar - Floating */}
-        {selectedRegion && (
-          <div className="absolute top-4 left-4 z-10 bg-[#111111]/90 backdrop-blur-sm border border-gray-800 rounded-lg px-4 py-3 flex items-center gap-3">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-            <div>
-              <div className="text-white font-semibold text-sm">{selectedRegion.name}</div>
-              <div className="text-xs text-gray-400">{selectedRegion.code}</div>
-            </div>
-            <button
-              onClick={() => setSelectedRegion(null)}
-              className="ml-2 text-gray-400 hover:text-white transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        )}
+        {/* Selected Regions Info Cards */}
+        <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap gap-3 max-h-[calc(100vh-8rem)] overflow-y-auto">
+          {Array.from(selectedRegions).map((code) => {
+            const region = regions.find(r => r.code === code)
+            if (!region) return null
+            return (
+              <div
+                key={code}
+                className="bg-[#111111]/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-4 shadow-2xl min-w-[280px] max-w-[320px]"
+              >
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs text-cyan-400 font-medium mb-1">Region</div>
+                    <div className="text-white font-semibold">{region.name}</div>
+                    <div className="text-xs text-gray-400 font-mono mt-1">{region.code}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newSelected = new Set(selectedRegions)
+                      newSelected.delete(code)
+                      setSelectedRegions(newSelected)
+                      if (selectedRegion?.code === code) {
+                        setSelectedRegion(null)
+                      }
+                    }}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="text-sm text-gray-300 font-medium">Region Details:</div>
+                  {region.info.map((item, idx) => (
+                    <div key={idx} className="text-sm text-gray-400 flex items-start gap-2">
+                      <span className="text-cyan-400 mt-0.5">•</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
 
         {/* Globe - Full Screen */}
         <div className="w-full h-full flex items-center justify-center">

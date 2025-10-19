@@ -7,8 +7,10 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'AWS Regions Explorer',
-  description: 'Explore the AWS regions around the world',
-  generator: 'v0.app',
+  description: 'Explore AWS datacenter locations worldwide',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
