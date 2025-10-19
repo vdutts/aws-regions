@@ -386,7 +386,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       const startRotation = [...rotation]
 
       const handleMouseMoveWhileDragging = (moveEvent: MouseEvent) => {
-        const sensitivity = 0.25
+        const sensitivity = 0.4
         const dx = moveEvent.clientX - startX
         const dy = moveEvent.clientY - startY
 
@@ -395,13 +395,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
         rotation[1] = Math.max(-90, Math.min(90, rotation[1]))
 
         projection.rotate(rotation)
-        
-        // Use requestAnimationFrame for smoother rendering
-        if (!window.requestAnimationFrame) {
-          render()
-        } else {
-          requestAnimationFrame(render)
-        }
+        render()
       }
 
       const handleMouseUp = () => {
@@ -414,44 +408,17 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       document.addEventListener("mouseup", handleMouseUp)
     }
 
-    let zoomAnimationFrame: number | null = null
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault()
       
-      // Smoother zoom with smaller increments
-      const scaleFactor = event.deltaY > 0 ? 0.95 : 1.05
+      // Responsive zoom - larger increments for faster zooming
+      const scaleFactor = event.deltaY > 0 ? 0.92 : 1.08
       const currentScale = projection.scale()
       const newRadius = Math.max(radius * 0.5, Math.min(radius * 3, currentScale * scaleFactor))
       
-      // Cancel any pending animation
-      if (zoomAnimationFrame) {
-        cancelAnimationFrame(zoomAnimationFrame)
-      }
-      
-      // Smooth zoom animation
-      const startScale = currentScale
-      const duration = 100 // ms
-      const startTime = Date.now()
-      
-      const animateZoom = () => {
-        const elapsed = Date.now() - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        
-        // Ease out
-        const eased = 1 - Math.pow(1 - progress, 3)
-        const scale = startScale + (newRadius - startScale) * eased
-        
-        projection.scale(scale)
-        render()
-        
-        if (progress < 1) {
-          zoomAnimationFrame = requestAnimationFrame(animateZoom)
-        } else {
-          zoomAnimationFrame = null
-        }
-      }
-      
-      animateZoom()
+      // Direct zoom - no animation for instant response
+      projection.scale(newRadius)
+      render()
     }
 
     canvas.addEventListener("mousemove", handleMouseMove)
@@ -481,17 +448,17 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     // Calculate target rotation to center the selected region
     const targetRotation = [-selectedRegion.lng, -selectedRegion.lat]
     
-    // Animate rotation with smoother easing
+    // Quick snappy animation
     const startRotation = [...rotation]
-    const duration = 800 // ms - faster
+    const duration = 500 // ms - snappier
     const startTime = Date.now()
 
     const animate = () => {
       const elapsed = Date.now() - startTime
       const progress = Math.min(elapsed / duration, 1)
       
-      // Smooth ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3)
+      // Ease-out quad for snappier feel
+      const eased = 1 - Math.pow(1 - progress, 2)
 
       rotation[0] = startRotation[0] + (targetRotation[0] - startRotation[0]) * eased
       rotation[1] = startRotation[1] + (targetRotation[1] - startRotation[1]) * eased
